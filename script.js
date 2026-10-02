@@ -4,40 +4,58 @@
 const GOOGLE_CLIENT_ID = "545857026324-nupajt623djcl8v69qj9nhhr1gg4c6.apps.googleusercontent.com";
 
 // ============================================
-// СПИСОК ФАЙЛОВ
+// СПИСОК МОДОВ (ключ = точное имя файла в папке files/)
 // ============================================
 const files = {
   "1074-cleo-4-gta-san-andreas.zip": {
     name: "CLEO 4 для GTA SA",
     size: "1 MB",
     icon: "🧩",
+    category: "scripts",
     desc: "Установщик CLEO 4. Нужен для работы скриптов, читов и модов. Запустить установщик и указать папку с GTA San Andreas."
   },
   "140690-widescreen-fix-gtasa_manual.zip": {
     name: "Widescreen Fix GTA SA",
     size: "35 KB",
     icon: "🖥️",
+    category: "fixes",
     desc: "Фикс широкоформатного разрешения. Убирает растянутую картинку на 16:9 и выше."
   },
   "261612-bmw-x3-m401-gtasa_manual.zip": {
     name: "BMW X3 M40i",
     size: "10.6 MB",
     icon: "🚗",
+    category: "cars",
     desc: "Мод добавляет BMW X3 M40i в GTA SA. Установка через IMG Tool."
   },
   "28034-vaz-2170-dps.zip": {
     name: "ВАЗ 2170 DPS",
     size: "9.2 MB",
-    icon: "🚗",
+    icon: "🚓",
+    category: "cars",
     desc: "Мод добавляет машину ВАЗ 2170 в раскраске ДПС. Установка через IMG Tool."
   },
   "sl-2-00-install.exe": {
     name: "Русификатор GTA SA",
     size: "5.5 MB",
     icon: "🇷🇺",
+    category: "russian",
     desc: "Полный русификатор для GTA San Andreas. Перевод интерфейса, миссий, диалогов."
   },
 };
+
+// ============================================
+// КАТЕГОРИИ
+// ============================================
+const categories = {
+  all:     { name: "Все моды", icon: "📦" },
+  cars:    { name: "Машины",   icon: "🚗" },
+  scripts: { name: "Скрипты",  icon: "🧩" },
+  fixes:   { name: "Фиксы",    icon: "🖥️" },
+  russian: { name: "Русики",   icon: "🇷🇺" },
+};
+
+let currentCategory = 'all';
 
 // ============================================
 // АККАУНТЫ
@@ -49,7 +67,7 @@ function setCurrentUser(u) { localStorage.setItem('currentUser', JSON.stringify(
 function logout() { localStorage.removeItem('currentUser'); location.reload(); }
 
 // ============================================
-// ПОКАЗ / СКРЫТИЕ ЭКРАНОВ
+// ПОКАЗ ЭКРАНОВ
 // ============================================
 function showAuthScreen() {
   document.getElementById('authScreen').style.display = 'flex';
@@ -60,7 +78,45 @@ function showSite() {
   document.getElementById('authScreen').style.display = 'none';
   document.getElementById('site').style.display = 'block';
   renderAuthBox();
+  renderStats();
+  renderCategories();
   renderFiles();
+}
+
+// ============================================
+// СТАТИСТИКА
+// ============================================
+function renderStats() {
+  const total = Object.keys(files).length;
+  const cats = new Set(Object.values(files).map(f => f.category)).size;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statCats').textContent = cats;
+}
+
+// ============================================
+// КАТЕГОРИИ
+// ============================================
+function renderCategories() {
+  const box = document.getElementById('categories');
+  box.innerHTML = '';
+
+  const counts = { all: Object.keys(files).length };
+  Object.values(files).forEach(f => {
+    counts[f.category] = (counts[f.category] || 0) + 1;
+  });
+
+  Object.entries(categories).forEach(([key, cat]) => {
+    if (key !== 'all' && !counts[key]) return;
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (key === currentCategory ? ' active' : '');
+    btn.innerHTML = `${cat.icon} ${cat.name} <span class="cat-count">${counts[key] || 0}</span>`;
+    btn.onclick = () => {
+      currentCategory = key;
+      renderCategories();
+      renderFiles(document.getElementById('search').value);
+    };
+    box.appendChild(btn);
+  });
 }
 
 // ============================================
@@ -72,9 +128,18 @@ const emptyMsg = document.getElementById('empty');
 function renderFiles(filter = '') {
   if (!grid) return;
   grid.innerHTML = '';
-  const entries = Object.entries(files).filter(([filename, meta]) =>
-    (meta.name + filename).toLowerCase().includes(filter.toLowerCase())
-  );
+
+  let entries = Object.entries(files);
+
+  if (currentCategory !== 'all') {
+    entries = entries.filter(([, meta]) => meta.category === currentCategory);
+  }
+
+  if (filter) {
+    entries = entries.filter(([filename, meta]) =>
+      (meta.name + filename).toLowerCase().includes(filter.toLowerCase())
+    );
+  }
 
   if (entries.length === 0) {
     emptyMsg.style.display = 'block';
@@ -82,16 +147,17 @@ function renderFiles(filter = '') {
   }
   emptyMsg.style.display = 'none';
 
-  entries.forEach(([filename, meta]) => {
+  entries.forEach(([filename, meta], i) => {
     const card = document.createElement('div');
     card.className = 'file-card';
+    card.style.animationDelay = (i * 0.06) + 's';
 
     card.innerHTML = `
       <div class="file-icon">${meta.icon || '📄'}</div>
       <div class="file-name">${meta.name}</div>
       <div class="file-desc">${meta.desc || ''}</div>
       <div class="file-meta">
-        <span>${meta.size || ''}</span>
+        <span class="file-size">${meta.size || ''}</span>
         <span class="file-download">⬇ Скачать</span>
       </div>
     `;
@@ -110,7 +176,7 @@ function renderFiles(filter = '') {
 }
 
 // ============================================
-// ШАПКА — КНОПКА ВЫЙТИ
+// ШАПКА — ЮЗЕР + ВЫЙТИ
 // ============================================
 function renderAuthBox() {
   const box = document.getElementById('authBox');
@@ -147,7 +213,7 @@ window.handleCredentialResponse = (response) => {
 };
 
 // ============================================
-// ФОРМА РЕГИСТРАЦИИ / ВХОДА
+// ФОРМА
 // ============================================
 let currentMode = 'register';
 
