@@ -11,7 +11,9 @@
 </head>
 <body>
 
-  <!-- ============ ЭКРАН ВХОДА ============ -->
+  <!-- ============================================
+       ЭКРАН ВХОДА
+       ============================================ -->
   <div class="auth-screen" id="authScreen">
     <div class="auth-bg">
       <div class="auth-bg-blob blob-1"></div>
@@ -50,10 +52,13 @@
     </div>
   </div>
 
-  <!-- ============ ОСНОВНОЙ САЙТ ============ -->
+  <!-- ============================================
+       ОСНОВНОЙ САЙТ
+       ============================================ -->
   <div class="site" id="site" style="display:none;">
     <div class="bg-glow"></div>
 
+    <!-- Шапка -->
     <header class="header">
       <div class="header-top">
         <div class="logo">
@@ -63,12 +68,33 @@
         <div class="auth-box" id="authBox"></div>
       </div>
       <p class="subtitle">Твоё личное хранилище модов и файлов</p>
+
+      <!-- Статистика -->
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-num" id="statTotal">0</span>
+          <span class="stat-label">модов</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" id="statCats">0</span>
+          <span class="stat-label">категорий</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">24/7</span>
+          <span class="stat-label">доступ</span>
+        </div>
+      </div>
     </header>
 
+    <!-- Контент -->
     <main class="container">
       <div class="search-box">
         <input type="text" id="search" placeholder="🔍 Поиск по модам...">
       </div>
+
+      <!-- Категории -->
+      <div class="categories" id="categories"></div>
+
       <div class="files-grid" id="filesGrid"></div>
       <p class="empty" id="empty" style="display:none;">Ничего не найдено 😕</p>
     </main>
