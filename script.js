@@ -4,7 +4,7 @@
 const GOOGLE_CLIENT_ID = "545857026324-nupajt623djcl8v69qj9nhhr1gg4c6.apps.googleusercontent.com";
 
 // ============================================
-// СПИСОК МОДОВ
+// МОДЫ
 // ============================================
 const files = {
   "1074-cleo-4-gta-san-andreas.zip": {
@@ -15,32 +15,32 @@ const files = {
     desc: "Установщик CLEO 4. Нужен для работы скриптов, читов и модов."
   },
   "140690-widescreen-fix-gtasa_manual.zip": {
-    name: "Widescreen Fix GTA SA",
+    name: "Widescreen Fix",
     size: "35 KB",
     icon: "🖥️",
     category: "fixes",
-    desc: "Фикс широкоформатного разрешения. Убирает растянутую картинку на 16:9 и выше."
+    desc: "Фикс широкоформатного разрешения. Убирает растянутую картинку."
   },
   "261612-bmw-x3-m401-gtasa_manual.zip": {
     name: "BMW X3 M40i",
     size: "10.6 MB",
     icon: "🚗",
     category: "cars",
-    desc: "Мод добавляет BMW X3 M40i в GTA SA. Установка через IMG Tool."
+    desc: "BMW X3 M40i в GTA SA. Установка через IMG Tool."
   },
   "28034-vaz-2170-dps.zip": {
     name: "ВАЗ 2170 DPS",
     size: "9.2 MB",
     icon: "🚓",
     category: "cars",
-    desc: "Мод добавляет машину ВАЗ 2170 в раскраске ДПС."
+    desc: "ВАЗ 2170 в раскраске ДПС. Установка через IMG Tool."
   },
   "sl-2-00-install.exe": {
-    name: "Русификатор GTA SA",
+    name: "Русификатор",
     size: "5.5 MB",
     icon: "🇷🇺",
     category: "russian",
-    desc: "Полный русификатор для GTA San Andreas. Перевод интерфейса, миссий, диалогов."
+    desc: "Полный русификатор GTA San Andreas. Перевод интерфейса, миссий, диалогов."
   },
 };
 
@@ -48,9 +48,9 @@ const files = {
 // КАТЕГОРИИ
 // ============================================
 const categories = {
-  all:     { name: "Все моды", icon: "📦" },
+  all:     { name: "Все",      icon: "📦" },
   cars:    { name: "Машины",   icon: "🚗" },
-  scripts: { name: "Скрипты",  icon: "🧩" },
+  scripts: { name: "CLEO",     icon: "🧩" },
   fixes:   { name: "Фиксы",    icon: "🖥️" },
   russian: { name: "Русики",   icon: "🇷🇺" },
 };
@@ -67,7 +67,7 @@ function setCurrentUser(u) { localStorage.setItem('currentUser', JSON.stringify(
 function logout() { localStorage.removeItem('currentUser'); location.reload(); }
 
 // ============================================
-// ПОКАЗ ЭКРАНОВ
+// ЭКРАНЫ
 // ============================================
 function showAuthScreen() {
   document.getElementById('authScreen').style.display = 'flex';
@@ -87,10 +87,9 @@ function showSite() {
 // СТАТИСТИКА
 // ============================================
 function renderStats() {
-  const total = Object.keys(files).length;
-  const cats = new Set(Object.values(files).map(f => f.category)).size;
-  document.getElementById('statTotal').textContent = total;
-  document.getElementById('statCats').textContent = cats;
+  document.getElementById('statTotal').textContent = Object.keys(files).length;
+  document.getElementById('statCats').textContent =
+    new Set(Object.values(files).map(f => f.category)).size;
 }
 
 // ============================================
@@ -101,15 +100,13 @@ function renderCategories() {
   box.innerHTML = '';
 
   const counts = { all: Object.keys(files).length };
-  Object.values(files).forEach(f => {
-    counts[f.category] = (counts[f.category] || 0) + 1;
-  });
+  Object.values(files).forEach(f => counts[f.category] = (counts[f.category] || 0) + 1);
 
   Object.entries(categories).forEach(([key, cat]) => {
     if (key !== 'all' && !counts[key]) return;
     const btn = document.createElement('button');
     btn.className = 'cat-btn' + (key === currentCategory ? ' active' : '');
-    btn.innerHTML = `${cat.icon} ${cat.name} <span class="cat-count">${counts[key] || 0}</span>`;
+    btn.innerHTML = `<span>${cat.icon}</span> ${cat.name} <span class="cat-count">${counts[key] || 0}</span>`;
     btn.onclick = () => {
       currentCategory = key;
       renderCategories();
@@ -120,7 +117,7 @@ function renderCategories() {
 }
 
 // ============================================
-// РЕНДЕР КАРТОЧЕК
+// КАРТОЧКИ
 // ============================================
 const grid = document.getElementById('filesGrid');
 const emptyMsg = document.getElementById('empty');
@@ -132,12 +129,12 @@ function renderFiles(filter = '') {
   let entries = Object.entries(files);
 
   if (currentCategory !== 'all') {
-    entries = entries.filter(([, meta]) => meta.category === currentCategory);
+    entries = entries.filter(([, m]) => m.category === currentCategory);
   }
 
   if (filter) {
-    entries = entries.filter(([filename, meta]) =>
-      (meta.name + filename).toLowerCase().includes(filter.toLowerCase())
+    entries = entries.filter(([fn, m]) =>
+      (m.name + fn).toLowerCase().includes(filter.toLowerCase())
     );
   }
 
@@ -152,13 +149,18 @@ function renderFiles(filter = '') {
     card.className = 'file-card';
     card.style.animationDelay = (i * 0.06) + 's';
 
+    const cat = categories[meta.category] || { name: '' };
+
     card.innerHTML = `
-      <div class="file-icon">${meta.icon || '📄'}</div>
+      <div class="file-card-top">
+        <div class="file-icon">${meta.icon || '📄'}</div>
+        <div class="file-cat">${cat.name}</div>
+      </div>
       <div class="file-name">${meta.name}</div>
       <div class="file-desc">${meta.desc || ''}</div>
       <div class="file-meta">
         <span class="file-size">${meta.size || ''}</span>
-        <span class="file-download">⬇ Скачать</span>
+        <span class="file-download">СКАЧАТЬ ⬇</span>
       </div>
     `;
 
@@ -176,7 +178,7 @@ function renderFiles(filter = '') {
 }
 
 // ============================================
-// ШАПКА — ЮЗЕР
+// ЮЗЕР В ШАПКЕ
 // ============================================
 function renderAuthBox() {
   const box = document.getElementById('authBox');
@@ -191,8 +193,11 @@ function renderAuthBox() {
   box.innerHTML = `
     <div class="user-pill">
       ${avatar}
-      <span>${user.name || 'User'}</span>
-      <button id="logoutBtn">Выйти</button>
+      <div class="user-info">
+        <div class="user-name">${user.name || 'User'}</div>
+        <div class="user-status">онлайн</div>
+      </div>
+      <button id="logoutBtn">ВЫЙТИ</button>
     </div>
   `;
   document.getElementById('logoutBtn').onclick = logout;
@@ -213,7 +218,7 @@ window.handleCredentialResponse = (response) => {
 };
 
 // ============================================
-// ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+// ВКЛАДКИ
 // ============================================
 let currentMode = 'register';
 
@@ -228,7 +233,7 @@ document.querySelectorAll('.auth-tab').forEach(tab => {
 });
 
 // ============================================
-// ФОРМА РЕГИСТРАЦИИ / ВХОДА
+// ФОРМА
 // ============================================
 document.getElementById('authForm').addEventListener('submit', (e) => {
   e.preventDefault();
@@ -236,7 +241,6 @@ document.getElementById('authForm').addEventListener('submit', (e) => {
   const password = document.getElementById('authPassword').value;
   const errEl = document.getElementById('authError');
 
-  // === ЛОГИН ===
   if (login.length < 3) { errEl.textContent = 'Логин минимум 3 символа'; return; }
   if (login.length > 12) { errEl.textContent = 'Логин максимум 12 символов'; return; }
   if (!/^[a-zA-Z0-9_]+$/.test(login)) {
@@ -244,7 +248,6 @@ document.getElementById('authForm').addEventListener('submit', (e) => {
     return;
   }
 
-  // === ПАРОЛЬ ===
   if (password.length < 8) { errEl.textContent = 'Пароль минимум 8 символов'; return; }
   if (!/[a-zA-Z]/.test(password)) { errEl.textContent = 'Пароль должен содержать буквы'; return; }
   if (!/[0-9]/.test(password)) { errEl.textContent = 'Пароль должен содержать цифры'; return; }
