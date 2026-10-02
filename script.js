@@ -232,6 +232,36 @@ document.getElementById('authForm').onsubmit = (e) => {
   const password = document.getElementById('authPassword').value;
   const errEl = document.getElementById('authError');
 
+  // === ПРОВЕРКА ЛОГИНА ===
+  if (login.length < 3) { errEl.textContent = 'Логин минимум 3 символа'; return; }
+  if (login.length > 12) { errEl.textContent = 'Логин максимум 12 символов'; return; }
+  if (!/^[a-zA-Z0-9_]+$/.test(login)) {
+    errEl.textContent = 'Логин: только латиница, цифры и _';
+    return;
+  }
+
+  // === ПРОВЕРКА ПАРОЛЯ ===
+  if (password.length < 8) { errEl.textContent = 'Пароль минимум 8 символов'; return; }
+  if (password.length > 64) { errEl.textContent = 'Пароль слишком длинный'; return; }
+  if (!/[a-zA-Z]/.test(password)) { errEl.textContent = 'Пароль должен содержать буквы'; return; }
+  if (!/[0-9]/.test(password)) { errEl.textContent = 'Пароль должен содержать цифры'; return; }
+  if (/^(.)\1+$/.test(password)) { errEl.textContent = 'Пароль слишком простой'; return; }
+
+  const users = getUsers();
+
+  if (currentMode === 'register') {
+    if (users[login]) { errEl.textContent = 'Такой логин уже занят'; return; }
+    users[login] = password;
+    saveUsers(users);
+    setCurrentUser({ name: login, via: 'local' });
+    showSite();
+  } else {
+    if (!users[login]) { errEl.textContent = 'Аккаунт не найден'; return; }
+    if (users[login] !== password) { errEl.textContent = 'Неверный пароль'; return; }
+    setCurrentUser({ name: login, via: 'local' });
+    showSite();
+  }
+};
   if (login.length < 3) { errEl.textContent = 'Логин минимум 3 символа'; return; }
   if (password.length < 4) { errEl.textContent = 'Пароль минимум 4 символа'; return; }
 
