@@ -41,12 +41,8 @@
         <button class="auth-tab" data-mode="login">Вход</button>
       </div>
 
-      <form id="authForm">
-        <input type="text" id="authLogin" placeholder="Логин" required minlength="3" autocomplete="username">
-        <input type="password" id="authPassword" placeholder="Пароль" required minlength="4" autocomplete="current-password">
-        <div class="auth-error" id="authError"></div>
-        <button type="submit" class="auth-submit" id="authSubmit">Зарегистрироваться</button>
-      </form>
+    <input type="text" id="authLogin" placeholder="Логин (3–12 символов)" required minlength="3" maxlength="12" autocomplete="username">
+<input type="password" id="authPassword" placeholder="Пароль (мин. 8, буквы + цифры)" required minlength="8" autocomplete="current-password">
 
       <p class="auth-hint">Регистрируясь, ты соглашаешься с правилами сайта.</p>
     </div>
