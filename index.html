@@ -4,34 +4,81 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Моды для GTA SA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="bg-glow"></div>
 
-  <header class="header">
-    <div class="header-top">
-      <div class="logo">
-        <span class="logo-icon">🚗</span>
-        <span class="logo-text">Моды для GTA SA</span>
+  <!-- ============ ЭКРАН ВХОДА ============ -->
+  <div class="auth-screen" id="authScreen">
+    <div class="auth-bg">
+      <div class="auth-bg-blob blob-1"></div>
+      <div class="auth-bg-blob blob-2"></div>
+      <div class="auth-bg-blob blob-3"></div>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-logo">
+        <span class="auth-logo-icon">🚗</span>
+        <h1 class="auth-logo-text">Моды для GTA SA</h1>
       </div>
-      <div class="auth-box" id="authBox"></div>
+
+      <p class="auth-subtitle">
+        Лучшие моды, CLEO-скрипты, машины, русификаторы.<br>
+        Войди, чтобы начать скачивать.
+      </p>
+
+      <div class="auth-google" id="googleBtn"></div>
+
+      <div class="auth-divider"><span>или</span></div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-mode="register">Регистрация</button>
+        <button class="auth-tab" data-mode="login">Вход</button>
+      </div>
+
+      <form id="authForm">
+        <input type="text" id="authLogin" placeholder="Логин" required minlength="3" autocomplete="username">
+        <input type="password" id="authPassword" placeholder="Пароль" required minlength="4" autocomplete="current-password">
+        <div class="auth-error" id="authError"></div>
+        <button type="submit" class="auth-submit" id="authSubmit">Зарегистрироваться</button>
+      </form>
+
+      <p class="auth-hint">Регистрируясь, ты соглашаешься с правилами сайта.</p>
     </div>
-    <p class="subtitle">Твоё личное хранилище модов и файлов</p>
-  </header>
+  </div>
 
-  <main class="container">
-    <div class="search-box">
-      <input type="text" id="search" placeholder="Поиск по модам...">
-    </div>
-    <div class="files-grid" id="filesGrid"></div>
-    <p class="empty" id="empty" style="display:none;">Ничего не найдено 😕</p>
-  </main>
+  <!-- ============ ОСНОВНОЙ САЙТ ============ -->
+  <div class="site" id="site" style="display:none;">
+    <div class="bg-glow"></div>
 
-  <footer class="footer">
-    <p>© 2026 Моды для GTA SA · сделано с душой</p>
-  </footer>
+    <header class="header">
+      <div class="header-top">
+        <div class="logo">
+          <span class="logo-icon">🚗</span>
+          <span class="logo-text">Моды для GTA SA</span>
+        </div>
+        <div class="auth-box" id="authBox"></div>
+      </div>
+      <p class="subtitle">Твоё личное хранилище модов и файлов</p>
+    </header>
 
+    <main class="container">
+      <div class="search-box">
+        <input type="text" id="search" placeholder="🔍 Поиск по модам...">
+      </div>
+      <div class="files-grid" id="filesGrid"></div>
+      <p class="empty" id="empty" style="display:none;">Ничего не найдено 😕</p>
+    </main>
+
+    <footer class="footer">
+      <p>© 2026 Моды для GTA SA · сделано с душой</p>
+    </footer>
+  </div>
+
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="script.js"></script>
 </body>
 </html>
