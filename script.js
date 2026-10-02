@@ -14,6 +14,18 @@ const files = {
     icon: "🖥️",
     desc: "Фикс широкоформатного разрешения. Убирает растянутую картинку на 16:9 и выше. Распаковать в папку с игрой."
   },
+  "261612-bmw-x3-m401-gtasa_manual.zip": {
+    name: "BMW X3 M40i",
+    size: "10.6 MB",
+    icon: "🚗",
+    desc: "Мод добавляет BMW X3 M40i в GTA SA. Установка через IMG Tool или Alci's IMG Editor."
+  },
+  "28034-vaz-2170-dps.zip": {
+    name: "ВАЗ 2170 DPS",
+    size: "9.2 MB",
+    icon: "🚗",
+    desc: "Мод добавляет машину ВАЗ 2170 в раскраске ДПС. Установка через IMG Tool или Alci's IMG Editor."
+  },
   "sl-2-00-install.exe": {
     name: "Русификатор GTA SA",
     size: "5.5 MB",
@@ -27,7 +39,7 @@ const files = {
 // ============================================
 function guessIcon(filename) {
   const n = filename.toLowerCase();
-  if (n.includes('car') || n.includes('машин') || n.includes('bmw')) return '🚗';
+  if (n.includes('car') || n.includes('машин') || n.includes('bmw') || n.includes('vaz') || n.includes('ваз')) return '🚗';
   if (n.includes('weapon') || n.includes('оруж')) return '🔫';
   if (n.includes('skin') || n.includes('скин')) return '🧍';
   if (n.includes('map') || n.includes('карт')) return '🗺️';
@@ -40,7 +52,7 @@ function guessIcon(filename) {
 }
 
 // ============================================
-// АККАУНТЫ
+// АККАУНТЫ (в localStorage)
 // ============================================
 function getUsers() { return JSON.parse(localStorage.getItem('users') || '{}'); }
 function saveUsers(u) { localStorage.setItem('users', JSON.stringify(u)); }
@@ -103,7 +115,7 @@ function renderFiles(filter = '') {
 }
 
 // ============================================
-// ШАПКА — вход / имя юзера
+// ШАПКА — кнопка входа / имя юзера
 // ============================================
 function renderAuthBox() {
   const box = document.getElementById('authBox');
