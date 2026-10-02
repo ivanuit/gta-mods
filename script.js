@@ -1,7 +1,7 @@
 // ============================================
 // GOOGLE CLIENT ID
 // ============================================
-const GOOGLE_CLIENT_ID = "545857026324-nupajt623djcl8v69qj9nhhr1gg4c6.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "545857026324-nupajt623djcl8v6i9qjt9nhhr1gg4c6.apps.googleusercontent.com";
 
 // ============================================
 // СПИСОК МОДОВ (ключ = точное имя файла в папке files/)
