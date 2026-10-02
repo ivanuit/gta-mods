@@ -1,5 +1,10 @@
 // ============================================
-// СПИСОК ФАЙЛОВ (ключ = точное имя файла в папке files/)
+// GOOGLE CLIENT ID
+// ============================================
+const GOOGLE_CLIENT_ID = "545857026324-nupajt623djcl8v69qj9nhhr1gg4c6.apps.googleusercontent.com";
+
+// ============================================
+// СПИСОК ФАЙЛОВ
 // ============================================
 const files = {
   "1074-cleo-4-gta-san-andreas.zip": {
@@ -12,53 +17,51 @@ const files = {
     name: "Widescreen Fix GTA SA",
     size: "35 KB",
     icon: "🖥️",
-    desc: "Фикс широкоформатного разрешения. Убирает растянутую картинку на 16:9 и выше. Распаковать в папку с игрой."
+    desc: "Фикс широкоформатного разрешения. Убирает растянутую картинку на 16:9 и выше."
   },
   "261612-bmw-x3-m401-gtasa_manual.zip": {
     name: "BMW X3 M40i",
     size: "10.6 MB",
     icon: "🚗",
-    desc: "Мод добавляет BMW X3 M40i в GTA SA. Установка через IMG Tool или Alci's IMG Editor."
+    desc: "Мод добавляет BMW X3 M40i в GTA SA. Установка через IMG Tool."
   },
   "28034-vaz-2170-dps.zip": {
     name: "ВАЗ 2170 DPS",
     size: "9.2 MB",
     icon: "🚗",
-    desc: "Мод добавляет машину ВАЗ 2170 в раскраске ДПС. Установка через IMG Tool или Alci's IMG Editor."
+    desc: "Мод добавляет машину ВАЗ 2170 в раскраске ДПС. Установка через IMG Tool."
   },
   "sl-2-00-install.exe": {
     name: "Русификатор GTA SA",
     size: "5.5 MB",
     icon: "🇷🇺",
-    desc: "Полный русификатор для GTA San Andreas. Перевод интерфейса, миссий и диалогов. Запустить установщик и следовать инструкциям."
+    desc: "Полный русификатор для GTA San Andreas. Перевод интерфейса, миссий, диалогов."
   },
 };
 
 // ============================================
-// Иконки (запасные, если нет icon у файла)
-// ============================================
-function guessIcon(filename) {
-  const n = filename.toLowerCase();
-  if (n.includes('car') || n.includes('машин') || n.includes('bmw') || n.includes('vaz') || n.includes('ваз')) return '🚗';
-  if (n.includes('weapon') || n.includes('оруж')) return '🔫';
-  if (n.includes('skin') || n.includes('скин')) return '🧍';
-  if (n.includes('map') || n.includes('карт')) return '🗺️';
-  if (n.includes('cleo')) return '🧩';
-  if (n.includes('sound') || n.includes('звук')) return '🔊';
-  if (n.includes('widescreen') || n.includes('fix')) return '🖥️';
-  if (n.includes('russ') || n.includes('рус') || n.includes('sl-2')) return '🇷🇺';
-  if (n.includes('txd') || n.includes('dff')) return '🎨';
-  return '📄';
-}
-
-// ============================================
-// АККАУНТЫ (в localStorage)
+// АККАУНТЫ
 // ============================================
 function getUsers() { return JSON.parse(localStorage.getItem('users') || '{}'); }
 function saveUsers(u) { localStorage.setItem('users', JSON.stringify(u)); }
-function getCurrentUser() { return localStorage.getItem('currentUser'); }
-function setCurrentUser(l) { localStorage.setItem('currentUser', l); }
+function getCurrentUser() { return JSON.parse(localStorage.getItem('currentUser') || 'null'); }
+function setCurrentUser(u) { localStorage.setItem('currentUser', JSON.stringify(u)); }
 function logout() { localStorage.removeItem('currentUser'); location.reload(); }
+
+// ============================================
+// ПОКАЗ / СКРЫТИЕ ЭКРАНОВ
+// ============================================
+function showAuthScreen() {
+  document.getElementById('authScreen').style.display = 'flex';
+  document.getElementById('site').style.display = 'none';
+}
+
+function showSite() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('site').style.display = 'block';
+  renderAuthBox();
+  renderFiles();
+}
 
 // ============================================
 // РЕНДЕР КАРТОЧЕК
@@ -67,6 +70,7 @@ const grid = document.getElementById('filesGrid');
 const emptyMsg = document.getElementById('empty');
 
 function renderFiles(filter = '') {
+  if (!grid) return;
   grid.innerHTML = '';
   const entries = Object.entries(files).filter(([filename, meta]) =>
     (meta.name + filename).toLowerCase().includes(filter.toLowerCase())
@@ -78,36 +82,27 @@ function renderFiles(filter = '') {
   }
   emptyMsg.style.display = 'none';
 
-  const logged = !!getCurrentUser();
-
   entries.forEach(([filename, meta]) => {
     const card = document.createElement('div');
     card.className = 'file-card';
 
-    const icon = meta.icon || guessIcon(filename);
-    const desc = meta.desc || 'Без описания';
-
     card.innerHTML = `
-      <div class="file-icon">${icon}</div>
+      <div class="file-icon">${meta.icon || '📄'}</div>
       <div class="file-name">${meta.name}</div>
-      <div class="file-desc">${desc}</div>
+      <div class="file-desc">${meta.desc || ''}</div>
       <div class="file-meta">
         <span>${meta.size || ''}</span>
-        <span class="file-download">${logged ? '⬇ Скачать' : '🔒 Войти'}</span>
+        <span class="file-download">⬇ Скачать</span>
       </div>
     `;
 
     card.addEventListener('click', () => {
-      if (!getCurrentUser()) {
-        openAuthModal();
-      } else {
-        const a = document.createElement('a');
-        a.href = `files/${encodeURIComponent(filename)}`;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }
+      const a = document.createElement('a');
+      a.href = `files/${encodeURIComponent(filename)}`;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     });
 
     grid.appendChild(card);
@@ -115,105 +110,106 @@ function renderFiles(filter = '') {
 }
 
 // ============================================
-// ШАПКА — кнопка входа / имя юзера
+// ШАПКА — КНОПКА ВЫЙТИ
 // ============================================
 function renderAuthBox() {
   const box = document.getElementById('authBox');
   const user = getCurrentUser();
-  if (user) {
-    box.innerHTML = `
-      <div class="user-pill">
-        <span class="user-avatar">${user[0].toUpperCase()}</span>
-        <span>${user}</span>
-        <button id="logoutBtn">Выйти</button>
-      </div>
-    `;
-    document.getElementById('logoutBtn').onclick = logout;
-  } else {
-    box.innerHTML = `<button class="login-btn" id="loginBtn">Войти</button>`;
-    document.getElementById('loginBtn').onclick = () => openAuthModal();
-  }
-}
+  if (!user) return;
 
-// ============================================
-// МОДАЛКА ВХОДА / РЕГИСТРАЦИИ
-// ============================================
-function openAuthModal(mode = 'login') {
-  if (document.getElementById('authModal')) return;
+  const initial = user.name ? user.name[0].toUpperCase() : '?';
+  const avatar = user.picture
+    ? `<img src="${user.picture}" class="user-avatar-img" alt="">`
+    : `<span class="user-avatar">${initial}</span>`;
 
-  const modal = document.createElement('div');
-  modal.id = 'authModal';
-  modal.className = 'modal-overlay';
-  modal.innerHTML = `
-    <div class="modal-box">
-      <button class="modal-close" id="modalClose">✕</button>
-      <div class="modal-icon">🔒</div>
-      <h2 class="modal-title" id="modalTitle">${mode === 'login' ? 'Вход в аккаунт' : 'Регистрация обязательна'}</h2>
-      <p class="modal-text">Создайте аккаунт или войдите, чтобы скачивать моды.</p>
-
-      <div class="auth-tabs">
-        <button class="auth-tab ${mode === 'login' ? 'active' : ''}" data-mode="login">Вход</button>
-        <button class="auth-tab ${mode === 'register' ? 'active' : ''}" data-mode="register">Регистрация</button>
-      </div>
-
-      <form id="authForm">
-        <input type="text" id="authLogin" placeholder="Логин" required minlength="3">
-        <input type="password" id="authPassword" placeholder="Пароль" required minlength="4">
-        <div class="auth-error" id="authError"></div>
-        <button type="submit" class="auth-submit" id="authSubmit">${mode === 'login' ? 'Войти' : 'Зарегистрироваться'}</button>
-      </form>
+  box.innerHTML = `
+    <div class="user-pill">
+      ${avatar}
+      <span>${user.name || 'User'}</span>
+      <button id="logoutBtn">Выйти</button>
     </div>
   `;
-  document.body.appendChild(modal);
-
-  let currentMode = mode;
-  const close = () => modal.remove();
-  document.getElementById('modalClose').onclick = close;
-  modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
-
-  modal.querySelectorAll('.auth-tab').forEach(tab => {
-    tab.onclick = () => {
-      currentMode = tab.dataset.mode;
-      modal.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t === tab));
-      document.getElementById('authSubmit').textContent = currentMode === 'login' ? 'Войти' : 'Зарегистрироваться';
-      document.getElementById('modalTitle').textContent = currentMode === 'login' ? 'Вход в аккаунт' : 'Регистрация обязательна';
-      document.getElementById('authError').textContent = '';
-    };
-  });
-
-  document.getElementById('authForm').onsubmit = (e) => {
-    e.preventDefault();
-    const login = document.getElementById('authLogin').value.trim().toLowerCase();
-    const password = document.getElementById('authPassword').value;
-    const errEl = document.getElementById('authError');
-
-    if (login.length < 3) { errEl.textContent = 'Логин минимум 3 символа'; return; }
-    if (password.length < 4) { errEl.textContent = 'Пароль минимум 4 символа'; return; }
-
-    const users = getUsers();
-
-    if (currentMode === 'register') {
-      if (users[login]) { errEl.textContent = 'Такой логин уже занят'; return; }
-      users[login] = password;
-      saveUsers(users);
-      setCurrentUser(login);
-      close();
-      renderAuthBox();
-      renderFiles(document.getElementById('search').value);
-    } else {
-      if (!users[login]) { errEl.textContent = 'Аккаунт не найден'; return; }
-      if (users[login] !== password) { errEl.textContent = 'Неверный пароль'; return; }
-      setCurrentUser(login);
-      close();
-      renderAuthBox();
-      renderFiles(document.getElementById('search').value);
-    }
-  };
+  document.getElementById('logoutBtn').onclick = logout;
 }
+
+// ============================================
+// GOOGLE АВТОРИЗАЦИЯ
+// ============================================
+function decodeJwt(token) {
+  const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+  return JSON.parse(decodeURIComponent(escape(atob(base64))));
+}
+
+window.handleCredentialResponse = (response) => {
+  const g = decodeJwt(response.credential);
+  setCurrentUser({ name: g.name, email: g.email, picture: g.picture, via: 'google' });
+  showSite();
+};
+
+// ============================================
+// ФОРМА РЕГИСТРАЦИИ / ВХОДА
+// ============================================
+let currentMode = 'register';
+
+document.querySelectorAll('.auth-tab').forEach(tab => {
+  tab.onclick = () => {
+    currentMode = tab.dataset.mode;
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t === tab));
+    document.getElementById('authSubmit').textContent =
+      currentMode === 'login' ? 'Войти' : 'Зарегистрироваться';
+    document.getElementById('authError').textContent = '';
+  };
+});
+
+document.getElementById('authForm').onsubmit = (e) => {
+  e.preventDefault();
+  const login = document.getElementById('authLogin').value.trim().toLowerCase();
+  const password = document.getElementById('authPassword').value;
+  const errEl = document.getElementById('authError');
+
+  if (login.length < 3) { errEl.textContent = 'Логин минимум 3 символа'; return; }
+  if (password.length < 4) { errEl.textContent = 'Пароль минимум 4 символа'; return; }
+
+  const users = getUsers();
+
+  if (currentMode === 'register') {
+    if (users[login]) { errEl.textContent = 'Такой логин уже занят'; return; }
+    users[login] = password;
+    saveUsers(users);
+    setCurrentUser({ name: login, via: 'local' });
+    showSite();
+  } else {
+    if (!users[login]) { errEl.textContent = 'Аккаунт не найден'; return; }
+    if (users[login] !== password) { errEl.textContent = 'Неверный пароль'; return; }
+    setCurrentUser({ name: login, via: 'local' });
+    showSite();
+  }
+};
 
 // ============================================
 // СТАРТ
 // ============================================
-document.getElementById('search').addEventListener('input', (e) => renderFiles(e.target.value));
-renderAuthBox();
-renderFiles();
+window.addEventListener('load', () => {
+  if (getCurrentUser()) {
+    showSite();
+    return;
+  }
+
+  showAuthScreen();
+
+  if (window.google && GOOGLE_CLIENT_ID) {
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleCredentialResponse,
+    });
+    google.accounts.id.renderButton(
+      document.getElementById('googleBtn'),
+      { theme: 'filled_black', size: 'large', text: 'continue_with', shape: 'pill', width: 320 }
+    );
+  } else {
+    document.getElementById('googleBtn').style.display = 'none';
+    document.querySelector('.auth-divider').style.display = 'none';
+  }
+});
+
+document.getElementById('search')?.addEventListener('input', (e) => renderFiles(e.target.value));
