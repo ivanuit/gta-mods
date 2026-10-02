@@ -1,9 +1,10 @@
 // ============================================
 // GOOGLE CLIENT ID
 // ============================================
-const GOOGLE_CLIENT_ID = "545857026324-nupajt623djcl8v6i9qjt9nhhr1gg4c6.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "545857026324-nupajt623djcl8v69qj9nhhr1gg4c6.apps.googleusercontent.com";
+
 // ============================================
-// СПИСОК МОДОВ (ключ = точное имя файла в папке files/)
+// СПИСОК МОДОВ
 // ============================================
 const files = {
   "1074-cleo-4-gta-san-andreas.zip": {
@@ -11,7 +12,7 @@ const files = {
     size: "1 MB",
     icon: "🧩",
     category: "scripts",
-    desc: "Установщик CLEO 4. Нужен для работы скриптов, читов и модов. Запустить установщик и указать папку с GTA San Andreas."
+    desc: "Установщик CLEO 4. Нужен для работы скриптов, читов и модов."
   },
   "140690-widescreen-fix-gtasa_manual.zip": {
     name: "Widescreen Fix GTA SA",
@@ -32,7 +33,7 @@ const files = {
     size: "9.2 MB",
     icon: "🚓",
     category: "cars",
-    desc: "Мод добавляет машину ВАЗ 2170 в раскраске ДПС. Установка через IMG Tool."
+    desc: "Мод добавляет машину ВАЗ 2170 в раскраске ДПС."
   },
   "sl-2-00-install.exe": {
     name: "Русификатор GTA SA",
@@ -175,7 +176,7 @@ function renderFiles(filter = '') {
 }
 
 // ============================================
-// ШАПКА — ЮЗЕР + ВЫЙТИ
+// ШАПКА — ЮЗЕР
 // ============================================
 function renderAuthBox() {
   const box = document.getElementById('authBox');
@@ -198,7 +199,7 @@ function renderAuthBox() {
 }
 
 // ============================================
-// GOOGLE АВТОРИЗАЦИЯ
+// GOOGLE
 // ============================================
 function decodeJwt(token) {
   const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
@@ -212,27 +213,30 @@ window.handleCredentialResponse = (response) => {
 };
 
 // ============================================
-// ФОРМА
+// ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
 // ============================================
 let currentMode = 'register';
 
 document.querySelectorAll('.auth-tab').forEach(tab => {
-  tab.onclick = () => {
+  tab.addEventListener('click', () => {
     currentMode = tab.dataset.mode;
     document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t === tab));
     document.getElementById('authSubmit').textContent =
       currentMode === 'login' ? 'Войти' : 'Зарегистрироваться';
     document.getElementById('authError').textContent = '';
-  };
+  });
 });
 
-document.getElementById('authForm').onsubmit = (e) => {
+// ============================================
+// ФОРМА РЕГИСТРАЦИИ / ВХОДА
+// ============================================
+document.getElementById('authForm').addEventListener('submit', (e) => {
   e.preventDefault();
   const login = document.getElementById('authLogin').value.trim().toLowerCase();
   const password = document.getElementById('authPassword').value;
   const errEl = document.getElementById('authError');
 
-  // === ПРОВЕРКА ЛОГИНА ===
+  // === ЛОГИН ===
   if (login.length < 3) { errEl.textContent = 'Логин минимум 3 символа'; return; }
   if (login.length > 12) { errEl.textContent = 'Логин максимум 12 символов'; return; }
   if (!/^[a-zA-Z0-9_]+$/.test(login)) {
@@ -240,9 +244,8 @@ document.getElementById('authForm').onsubmit = (e) => {
     return;
   }
 
-  // === ПРОВЕРКА ПАРОЛЯ ===
+  // === ПАРОЛЬ ===
   if (password.length < 8) { errEl.textContent = 'Пароль минимум 8 символов'; return; }
-  if (password.length > 64) { errEl.textContent = 'Пароль слишком длинный'; return; }
   if (!/[a-zA-Z]/.test(password)) { errEl.textContent = 'Пароль должен содержать буквы'; return; }
   if (!/[0-9]/.test(password)) { errEl.textContent = 'Пароль должен содержать цифры'; return; }
   if (/^(.)\1+$/.test(password)) { errEl.textContent = 'Пароль слишком простой'; return; }
@@ -261,25 +264,7 @@ document.getElementById('authForm').onsubmit = (e) => {
     setCurrentUser({ name: login, via: 'local' });
     showSite();
   }
-};
-  if (login.length < 3) { errEl.textContent = 'Логин минимум 3 символа'; return; }
-  if (password.length < 4) { errEl.textContent = 'Пароль минимум 4 символа'; return; }
-
-  const users = getUsers();
-
-  if (currentMode === 'register') {
-    if (users[login]) { errEl.textContent = 'Такой логин уже занят'; return; }
-    users[login] = password;
-    saveUsers(users);
-    setCurrentUser({ name: login, via: 'local' });
-    showSite();
-  } else {
-    if (!users[login]) { errEl.textContent = 'Аккаунт не найден'; return; }
-    if (users[login] !== password) { errEl.textContent = 'Неверный пароль'; return; }
-    setCurrentUser({ name: login, via: 'local' });
-    showSite();
-  }
-};
+});
 
 // ============================================
 // СТАРТ
@@ -292,15 +277,21 @@ window.addEventListener('load', () => {
 
   showAuthScreen();
 
-  if (window.google && GOOGLE_CLIENT_ID) {
-    google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: handleCredentialResponse,
-    });
-    google.accounts.id.renderButton(
-      document.getElementById('googleBtn'),
-      { theme: 'filled_black', size: 'large', text: 'continue_with', shape: 'pill', width: 320 }
-    );
+  if (window.google && GOOGLE_CLIENT_ID && !GOOGLE_CLIENT_ID.startsWith("СЮДА")) {
+    try {
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleCredentialResponse,
+      });
+      google.accounts.id.renderButton(
+        document.getElementById('googleBtn'),
+        { theme: 'filled_black', size: 'large', text: 'continue_with', shape: 'pill', width: 320 }
+      );
+    } catch (err) {
+      console.error('Google init error:', err);
+      document.getElementById('googleBtn').style.display = 'none';
+      document.querySelector('.auth-divider').style.display = 'none';
+    }
   } else {
     document.getElementById('googleBtn').style.display = 'none';
     document.querySelector('.auth-divider').style.display = 'none';
